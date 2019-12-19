@@ -4,34 +4,22 @@
 class GildedRose(object):
 
     def __init__(self, items):
-        self.items = items
+        self.items = []
+        for item in items:
+            if item.is_of_legendary_type():
+                self.items.append(Legendary(item))
+            elif item.is_of_type_event():
+                self.items.append(Event(item))
+            elif item.is_of_aging_beautifully_type():
+                self.items.append(BeautifullyAging(item))
+            elif item.is_of_conjured_type():
+                self.items.append(Conjured(item))
+            else:
+                self.items.append(Standard(item))
 
     def update_quality(self):
         for item in self.items:
-            if item.is_of_decreasing_quality_type():
-                if item.quality > 0:
-                    item.quality = item.quality - 1
-            else:
-                if item.quality < 50:
-                    item.quality = item.quality + 1
-                    if item.is_of_type_event():
-                        if item.sell_in < 11:
-                            item.quality = item.quality + 1
-                        if item.sell_in < 6:
-                            item.quality = item.quality + 1
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                item.sell_in = item.sell_in - 1
-            if item.sell_in < 0:
-                if item.name != "Aged Brie":
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
-                    else:
-                        item.quality = item.quality - item.quality
-                else:
-                    if item.quality < 50:
-                        item.quality = item.quality + 1
+            item.update()
 
 
 class Item:
@@ -46,10 +34,89 @@ class Item:
     def is_of_legendary_type(self):
         return self.name == "Sulfuras, Hand of Ragnaros"
 
+    def is_of_aging_beautifully_type(self):
+        return self.name == "Aged Brie"
+
     def is_of_decreasing_quality_type(self):
-        return self.name != "Aged Brie" \
+        return not self.is_of_aging_beautifully_type() \
                and not self.is_of_type_event() \
                and not self.is_of_legendary_type()
 
+    def is_of_conjured_type(self):
+        return self.name == "conjured"
+
     def __repr__(self):
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
+
+
+class Standard:
+    def __init__(self, item: Item):
+        self.item = item
+
+    def update(self):
+        self._update_sell_in()
+        self._update_quality()
+
+    def _update_sell_in(self):
+        self.item.sell_in -= 1
+
+    def _update_quality(self):
+        if self.item.quality > 0:
+            self.item.quality += -1
+
+        if self.item.quality > 0 and self.item.sell_in < 0:
+            self.item.quality += -1
+
+
+class Legendary(Standard):
+    def __init__(self, item):
+        super().__init__(item)
+
+    def _update_sell_in(self):
+        self.item.sell_in += 0
+
+    def _update_quality(self):
+        self.item.quality += 0
+
+
+class Event(Standard):
+    def __init__(self, item):
+        super().__init__(item)
+
+    def _update_quality(self):
+        self.item.quality += 1
+
+        if self.item.sell_in < 10:
+            self.item.quality += 1
+
+        if self.item.sell_in < 5:
+            self.item.quality += 1
+
+        if self.item.sell_in < 0:
+            self.item.quality = 0
+
+
+class BeautifullyAging(Standard):
+    def __init__(self, item):
+        super().__init__(item)
+
+    def _update_quality(self):
+        if self.item.quality < 50:
+            self.item.quality += 1
+
+
+class Conjured(Standard):
+    def __init__(self, item):
+        super().__init__(item)
+
+    def _update_quality(self):
+        if self.item.quality > 0:
+            self.item.quality += -1
+        if self.item.quality > 0:
+            self.item.quality += -1
+
+        if self.item.sell_in < 0:
+            if self.item.quality > 0:
+                self.item.quality += -1
+            if self.item.quality > 0:
+                self.item.quality += -1

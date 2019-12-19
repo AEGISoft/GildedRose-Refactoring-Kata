@@ -27,6 +27,14 @@ class GildedRoseTest(unittest.TestCase):
                             item_sell_in=0, expected_sell_in=-1,
                             item_quality=10, expected_quality=8)
 
+    def test_conjured_items_degrade_twice_as_fast_as_normal_items(self):
+        self.update_quality("conjured",
+                            item_sell_in=10, expected_sell_in=9,
+                            item_quality=10, expected_quality=8)
+        self.update_quality("conjured",
+                            item_sell_in=0, expected_sell_in=-1,
+                            item_quality=10, expected_quality=6)
+
     def test_quality_never_drops_below_zero(self):
         self.update_quality("brick",
                             item_sell_in=0, expected_sell_in=-1,
