@@ -8,20 +8,17 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
-            if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
+            if item.is_of_decreasing_quality_type():
                 if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
+                    item.quality = item.quality - 1
             else:
                 if item.quality < 50:
                     item.quality = item.quality + 1
-                    if item.name == "Backstage passes to a TAFKAL80ETC concert":
+                    if item.is_of_type_event():
                         if item.sell_in < 11:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
+                            item.quality = item.quality + 1
                         if item.sell_in < 6:
-                            if item.quality < 50:
-                                item.quality = item.quality + 1
+                            item.quality = item.quality + 1
             if item.name != "Sulfuras, Hand of Ragnaros":
                 item.sell_in = item.sell_in - 1
             if item.sell_in < 0:
@@ -42,6 +39,17 @@ class Item:
         self.name = name
         self.sell_in = sell_in
         self.quality = quality
+
+    def is_of_type_event(self):
+        return self.name == "Backstage passes to a TAFKAL80ETC concert"
+
+    def is_of_legendary_type(self):
+        return self.name == "Sulfuras, Hand of Ragnaros"
+
+    def is_of_decreasing_quality_type(self):
+        return self.name != "Aged Brie" \
+               and not self.is_of_type_event() \
+               and not self.is_of_legendary_type()
 
     def __repr__(self):
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
