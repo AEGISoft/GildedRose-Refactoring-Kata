@@ -28,17 +28,17 @@ class GildedRoseTest(unittest.TestCase):
                             item_quality=10, expected_quality=8)
 
     def test_conjured_items_degrade_twice_as_fast_as_normal_items(self):
-        self.update_quality("conjured",
+        self.update_quality("Conjured brick",
                             item_sell_in=10, expected_sell_in=9,
                             item_quality=10, expected_quality=8)
-        self.update_quality("conjured",
+        self.update_quality("Conjured brick",
                             item_sell_in=0, expected_sell_in=-1,
                             item_quality=10, expected_quality=6)
 
     def test_quality_never_drops_below_zero(self):
         self.update_quality("brick",
                             item_sell_in=0, expected_sell_in=-1,
-                            item_quality=1, expected_quality=0)
+                            item_quality=0, expected_quality=0)
 
     def test_aged_brie_increases_in_quality_over_time(self):
         self.update_quality("Aged Brie",
